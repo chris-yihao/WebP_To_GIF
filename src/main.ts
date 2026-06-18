@@ -229,7 +229,18 @@ async function openOutputDir(): Promise<void> {
 
 async function startConversion(paths: string[]): Promise<void> {
   const webpPaths = paths.filter((path) => path.toLowerCase().endsWith(".webp"));
-  if (!webpPaths.length) {
+  const skippedPaths = paths.filter((path) => !path.toLowerCase().endsWith(".webp"));
+
+  for (const path of skippedPaths) {
+    state.jobs.set(path, {
+      filePath: path,
+      status: "failed",
+      progress: 100,
+      error: "不是 WebP 文件，已跳过",
+    });
+  }
+
+  if (!webpPaths.length && !skippedPaths.length) {
     return;
   }
 
@@ -241,6 +252,10 @@ async function startConversion(paths: string[]): Promise<void> {
     });
   }
   render();
+
+  if (!webpPaths.length) {
+    return;
+  }
 
   if (!isTauri) {
     seedPreviewJob();

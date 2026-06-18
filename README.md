@@ -2,7 +2,7 @@
 
 一个简单直白的 WebP 转 GIF 桌面工具。拖入或选择 `.webp` 文件后会自动转换为 `.gif`，并尽量保留动态帧和播放时长。
 
-当前版本：`1.0.0`  
+当前版本：`1.0.1`  
 作者：`Chris_yihao`
 
 ## 功能
@@ -103,7 +103,7 @@ macOS 构建产物通常在：
 
 ```text
 src-tauri/target/release/bundle/macos/WebP 转 GIF.app
-src-tauri/target/release/bundle/dmg/WebP 转 GIF_1.0.0_aarch64.dmg
+src-tauri/target/release/bundle/dmg/WebP 转 GIF_1.0.1_aarch64.dmg
 ```
 
 Windows 构建产物通常在：
@@ -118,5 +118,5 @@ src-tauri/target/release/bundle/nsis/
 
 - GIF 格式最多支持 256 色，转换后颜色可能和原 WebP 略有差异。
 - 第一版只做 WebP 到 GIF，不包含尺寸调整、压缩质量、帧率修改等高级设置。
-- 如果某个文件损坏或不是 WebP，软件会显示失败状态，但不会影响其他文件继续转换。
+- 如果某个文件损坏会显示失败状态；如果拖入的不是 WebP，会显示“不是 WebP 文件，已跳过”，不会影响其他文件继续转换。
 - 最近完成记录只保留在当前运行期间，关闭软件后会自动清空。

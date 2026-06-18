@@ -59,6 +59,10 @@ if (mainTs.includes("webPToGif") || indexHtml.includes("webPToGif") || readme.in
   throw new Error("Expected user-facing app name to be WebP 转 GIF");
 }
 
+if (!mainTs.includes("不是 WebP 文件，已跳过")) {
+  throw new Error("Expected non-WebP files to show a visible skipped message");
+}
+
 if (tauriConfig.productName !== "WebP 转 GIF") {
   throw new Error("Expected Tauri productName to be WebP 转 GIF");
 }

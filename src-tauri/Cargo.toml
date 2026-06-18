@@ -1,6 +1,6 @@
 [package]
 name = "webptogif"
-version = "1.0.0"
+version = "1.0.1"
 description = "Beginner-friendly WebP to GIF converter"
 authors = ["Chris_yihao"]
 edition = "2021"
