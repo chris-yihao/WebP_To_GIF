@@ -7,7 +7,7 @@ edition = "2021"
 
 [lib]
 name = "webp_to_gif"
-crate-type = ["staticlib", "cdylib", "rlib"]
+crate-type = ["rlib"]
 
 [[bin]]
 name = "webPToGif"

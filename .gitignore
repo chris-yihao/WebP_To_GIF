@@ -4,4 +4,5 @@ dist/
 src-tauri/target/
 src-tauri/gen/
 .superpowers/
+.tools/
 *.log

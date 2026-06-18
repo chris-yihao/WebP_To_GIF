@@ -25,6 +25,8 @@
 - 最近完成记录改为只保留当前运行期间，关闭软件后自动清空。
 - 删除“更多设置”入口，右侧“正在转换”和“最近完成”改为等高布局。
 - 更新 README 中的使用说明、打包产物路径和注意事项。
+- Windows 发布版使用 GUI 子系统，直接运行时不再额外弹出控制台窗口。
+- 新增 Windows 单文件便携版生成脚本，可把主程序和 WebView2 loader 打包进一个 `.exe`。
 
 ### 1.0.0
 
@@ -111,11 +113,13 @@ cargo test
 
 ## 打包
 
-构建桌面应用：
+macOS 和 Windows 都使用同一个打包入口：
 
 ```bash
 npm run tauri:build
 ```
+
+这个命令会先执行 Tauri 的正常发布构建。macOS 下会在构建完成后自动运行 `scripts/fix-macos-bundle.mjs`，修正 `.app/.dmg` 包；Windows 下会直接生成 Windows 安装包。
 
 macOS 构建产物通常在：
 
@@ -126,13 +130,34 @@ src-tauri/target/release/bundle/dmg/WebP 转 GIF_1.0.1_aarch64.dmg
 
 打开 DMG 后，把 `WebP 转 GIF.app` 拖到 `Applications` 图标上即可安装到“应用程序”。
 
-Windows 构建产物通常在：
+Windows 安装包通常在：
 
 ```text
-src-tauri/target/release/bundle/nsis/
+src-tauri/target/release/bundle/nsis/WebP 转 GIF_1.0.1_x64-setup.exe
+```
+
+Windows 也会生成直接运行版：
+
+```text
+src-tauri/target/release/webPToGif.exe
+src-tauri/target/release/WebView2Loader.dll
+```
+
+如果需要对外只分发一个 `.exe`，在 Windows 上先执行 `npm run tauri:build`，再执行：
+
+```bash
+npm run portable:windows
+```
+
+单文件便携版会生成到：
+
+```text
+src-tauri/target/release/WebP_To_GIF_Portable.exe
 ```
 
 正式发布 macOS 版本时，还需要按 Apple 要求配置签名和公证。
+
+Windows 单文件便携版运行时会把内置的主程序和 WebView2 loader 解压到系统临时目录后启动。用户只需要双击这一个 `.exe`，界面仍然只有主应用窗口。
 
 ## 注意事项
 

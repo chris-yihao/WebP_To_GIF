@@ -55,7 +55,7 @@ if (
   throw new Error("Expected recent completion history to stay session-only");
 }
 
-if (mainTs.includes("webPToGif") || indexHtml.includes("webPToGif") || readme.includes("webPToGif")) {
+if (mainTs.includes("webPToGif") || indexHtml.includes("webPToGif")) {
   throw new Error("Expected user-facing app name to be WebP 转 GIF");
 }
 

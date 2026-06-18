@@ -9,7 +9,8 @@
     "preview": "vite preview --host 127.0.0.1",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
-    "tauri:build": "tauri build; node scripts/fix-macos-bundle.mjs"
+    "tauri:build": "node scripts/build-tauri.mjs",
+    "portable:windows": "powershell -ExecutionPolicy Bypass -File scripts/build-portable.ps1"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.11.0",
