@@ -1,0 +1,30 @@
+[package]
+name = "webptogif"
+version = "1.0.0"
+description = "Beginner-friendly WebP to GIF converter"
+authors = ["Chris_yihao"]
+edition = "2021"
+
+[lib]
+name = "webp_to_gif"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "webPToGif"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+gif = "0.13"
+open = "5"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+thiserror = "2"
+webp-animation = "0.10"
+
+[dev-dependencies]
+tempfile = "3"
