@@ -80,6 +80,10 @@ if (!macosBundleFix.includes('const appName = "WebP 转 GIF"') || !macosBundleFi
   throw new Error("Expected macOS bundle fix script to use the new app name");
 }
 
+if (!macosBundleFix.includes('symlinkSync("/Applications"')) {
+  throw new Error("Expected DMG to include an Applications install shortcut");
+}
+
 if (mainWindow.resizable !== false) {
   throw new Error("Expected main window to be fixed size with resizable: false");
 }

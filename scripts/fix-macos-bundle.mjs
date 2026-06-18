@@ -1,4 +1,4 @@
-import { existsSync, rmSync } from "node:fs";
+import { cpSync, existsSync, rmSync, symlinkSync } from "node:fs";
 import { readFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
@@ -25,6 +25,15 @@ const dmgPath = join(
   "bundle",
   "dmg",
   `${appName}_${version}_aarch64.dmg`,
+);
+const dmgSourcePath = join(
+  root,
+  "src-tauri",
+  "target",
+  "release",
+  "bundle",
+  "dmg",
+  `${appName}-dmg-source`,
 );
 
 function run(command, args, options = {}) {
@@ -53,14 +62,23 @@ if (existsSync(dmgPath)) {
   rmSync(dmgPath);
 }
 
+if (existsSync(dmgSourcePath)) {
+  rmSync(dmgSourcePath, { recursive: true, force: true });
+}
+
+cpSync(appPath, join(dmgSourcePath, `${appName}.app`), { recursive: true });
+symlinkSync("/Applications", join(dmgSourcePath, "Applications"));
+
 run("hdiutil", [
   "create",
   "-volname",
   appName,
   "-srcfolder",
-  appPath,
+  dmgSourcePath,
   "-ov",
   "-format",
   "UDZO",
   dmgPath,
 ]);
+
+rmSync(dmgSourcePath, { recursive: true, force: true });
