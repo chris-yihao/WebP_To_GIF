@@ -6,6 +6,7 @@ import { join } from "node:path";
 const root = process.cwd();
 const packageJson = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
 const version = packageJson.version;
+const appName = "WebP 转 GIF";
 const appPath = join(
   root,
   "src-tauri",
@@ -13,7 +14,7 @@ const appPath = join(
   "release",
   "bundle",
   "macos",
-  "webPToGif.app",
+  `${appName}.app`,
 );
 const plistPath = join(appPath, "Contents", "Info.plist");
 const dmgPath = join(
@@ -23,7 +24,7 @@ const dmgPath = join(
   "release",
   "bundle",
   "dmg",
-  `webPToGif_${version}_aarch64.dmg`,
+  `${appName}_${version}_aarch64.dmg`,
 );
 
 function run(command, args, options = {}) {
@@ -55,7 +56,7 @@ if (existsSync(dmgPath)) {
 run("hdiutil", [
   "create",
   "-volname",
-  "webPToGif",
+  appName,
   "-srcfolder",
   appPath,
   "-ov",

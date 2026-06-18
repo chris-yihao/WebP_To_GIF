@@ -4,10 +4,8 @@
 
 use std::path::PathBuf;
 use std::sync::Mutex;
-use std::time::{SystemTime, UNIX_EPOCH};
 
 use converter::convert_webp_to_gif;
-use history::{HistoryEntry, HistoryStore};
 use output::{
     default_output_dir_for_executable, ensure_output_dir, is_webp_file, unique_gif_path,
 };
@@ -17,7 +15,6 @@ use tauri::{AppHandle, Emitter, Manager, State};
 use tauri_plugin_dialog::DialogExt;
 
 pub mod converter;
-pub mod history;
 pub mod output;
 pub mod settings;
 
@@ -25,7 +22,6 @@ pub mod settings;
 struct AppState {
     output_dir: Mutex<PathBuf>,
     settings_store: SettingsStore,
-    history_store: HistoryStore,
 }
 
 #[derive(Clone, Debug, Serialize)]
@@ -40,14 +36,6 @@ pub struct ConversionJob {
 
 fn path_to_string(path: PathBuf) -> String {
     path.to_string_lossy().to_string()
-}
-
-fn now_stamp() -> String {
-    let seconds = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .map(|duration| duration.as_secs())
-        .unwrap_or(0);
-    format!("{seconds}")
 }
 
 fn emit_progress(app: &AppHandle, job: &ConversionJob) {
@@ -127,11 +115,6 @@ fn open_output_dir(state: State<'_, AppState>) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn load_history(state: State<'_, AppState>) -> Result<Vec<HistoryEntry>, String> {
-    state.history_store.load().map_err(|error| error.to_string())
-}
-
-#[tauri::command]
 fn convert_files(
     app: AppHandle,
     paths: Vec<String>,
@@ -150,7 +133,6 @@ fn convert_files(
     ensure_output_dir(&selected_output_dir).map_err(|error| error.to_string())?;
 
     let mut jobs = Vec::new();
-    let mut history = state.history_store.load().unwrap_or_default();
 
     for file_path in paths {
         let source = PathBuf::from(&file_path);
@@ -168,7 +150,6 @@ fn convert_files(
             job.progress = 100;
             job.error = Some("请选择 WebP 文件".into());
             emit_progress(&app, &job);
-            history.insert(0, history_entry(&job, "请选择 WebP 文件"));
             jobs.push(job);
             continue;
         }
@@ -190,37 +171,19 @@ fn convert_files(
                 job.progress = 100;
                 job.output_path = Some(path_to_string(output_path));
                 emit_progress(&app, &job);
-                history.insert(0, history_entry(&job, "转换完成"));
             }
             Err(error) => {
                 job.status = "failed".into();
                 job.progress = 100;
                 job.error = Some(error.clone());
                 emit_progress(&app, &job);
-                history.insert(0, history_entry(&job, &error));
             }
         }
 
         jobs.push(job);
     }
 
-    history.truncate(50);
-    state
-        .history_store
-        .save(&history)
-        .map_err(|error| error.to_string())?;
-
     Ok(jobs)
-}
-
-fn history_entry(job: &ConversionJob, message: &str) -> HistoryEntry {
-    HistoryEntry {
-        file_path: job.file_path.clone(),
-        output_path: job.output_path.clone(),
-        status: job.status.clone(),
-        message: message.into(),
-        completed_at: now_stamp(),
-    }
 }
 
 pub fn run() {
@@ -229,7 +192,6 @@ pub fn run() {
         .setup(|app| {
             let app_data = app_data_dir(app);
             let settings_store = SettingsStore::new(app_data.join("settings.json"));
-            let history_store = HistoryStore::new(app_data.join("history.json"));
             let default_output_dir = initial_output_dir()?;
             let settings = settings_store
                 .load_or_default(default_output_dir)
@@ -240,7 +202,6 @@ pub fn run() {
             app.manage(AppState {
                 output_dir: Mutex::new(output_dir),
                 settings_store,
-                history_store,
             });
 
             Ok(())
@@ -250,7 +211,6 @@ pub fn run() {
             set_output_dir,
             choose_output_dir,
             open_output_dir,
-            load_history,
             convert_files
         ])
         .run(tauri::generate_context!())

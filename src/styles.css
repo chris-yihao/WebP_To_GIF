@@ -156,7 +156,6 @@ button {
 }
 
 .panel,
-.secondary-button,
 .output-bar {
   background: #fff;
   border: 1px solid #dce2ec;
@@ -195,8 +194,8 @@ button {
   padding-right: 2px;
 }
 
-.side-panel > .panel:first-child {
-  flex: 0 1 252px;
+.side-panel > .panel {
+  flex: 1 1 0;
 }
 
 .job {
@@ -286,10 +285,6 @@ button {
   cursor: pointer;
 }
 
-.history-panel {
-  flex: 1 1 0;
-}
-
 .history-item {
   display: flex;
   flex-direction: column;
@@ -314,14 +309,6 @@ button {
   color: #7a8597;
   text-align: center;
   font-size: 13px;
-}
-
-.secondary-button {
-  min-height: 44px;
-  padding: 0 14px;
-  color: #4b5565;
-  text-align: left;
-  cursor: pointer;
 }
 
 .output-bar {

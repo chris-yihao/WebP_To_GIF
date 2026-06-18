@@ -20,12 +20,11 @@ type ConversionJob = {
   error?: string | null;
 };
 
-type HistoryEntry = {
+type RecentItem = {
   filePath: string;
   outputPath?: string | null;
   status: string;
   message: string;
-  completedAt: string;
 };
 
 const isTauri = "__TAURI_INTERNALS__" in window;
@@ -33,7 +32,6 @@ const isTauri = "__TAURI_INTERNALS__" in window;
 const state = {
   outputDir: "软件所在文件夹 / GIF",
   jobs: new Map<string, ConversionJob>(),
-  history: [] as HistoryEntry[],
   dragActive: false,
 };
 let previewJobCount = 0;
@@ -61,18 +59,16 @@ function latestJobs(): ConversionJob[] {
   return Array.from(state.jobs.values()).reverse();
 }
 
-function completedHistory(): HistoryEntry[] {
-  const fromJobs = Array.from(state.jobs.values())
+function completedHistory(): RecentItem[] {
+  return Array.from(state.jobs.values())
     .filter((job) => job.status === "completed" || job.status === "failed")
     .map((job) => ({
       filePath: job.filePath,
       outputPath: job.outputPath,
       status: job.status,
       message: job.status === "completed" ? "转换完成" : job.error || "转换失败",
-      completedAt: "",
-    }));
-
-  return [...fromJobs, ...state.history].slice(0, 50);
+    }))
+    .slice(0, 50);
 }
 
 function render(): void {
@@ -83,7 +79,7 @@ function render(): void {
     <section class="shell">
       <header class="header">
         <div>
-          <h1>webPToGif</h1>
+          <h1>WebP 转 GIF</h1>
           <p>拖入文件后自动转换，动图效果会保留</p>
         </div>
       </header>
@@ -147,8 +143,6 @@ function render(): void {
               }
             </div>
           </section>
-
-          <button class="secondary-button" type="button" aria-label="更多设置">更多设置</button>
         </aside>
       </section>
 
@@ -292,8 +286,6 @@ async function bootstrap(): Promise<void> {
   });
 
   state.outputDir = await invoke<string>("get_output_dir");
-  state.history = await invoke<HistoryEntry[]>("load_history");
-
   await listen<ConversionJob>("conversion-progress", (event) => {
     state.jobs.set(event.payload.filePath, event.payload);
     render();
